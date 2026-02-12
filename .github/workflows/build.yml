@@ -1,0 +1,59 @@
+name: Build and Package
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, ctype, json, curl, gd, zip
+          coverage: none
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: PrettyPicture-react/package-lock.json
+
+      - name: Install PHP dependencies
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: Install frontend dependencies
+        working-directory: PrettyPicture-react
+        run: npm install
+
+      - name: Build frontend
+        working-directory: PrettyPicture-react
+        run: npm run build
+
+      - name: Copy build files to public
+        run: cp -r PrettyPicture-react/dist/* public/
+
+      - name: Create release archive
+        run: |
+          zip -r release.zip . \
+            -x "PrettyPicture-react/*" \
+            -x ".git/*" \
+            -x ".github/*" \
+            -x "*.git*"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: prettypicture-release
+          path: release.zip
+          retention-days: 30
