@@ -108,8 +108,8 @@ export const Upload: React.FC<UploadProps> = ({
     });
   };
 
-  const uploadSingleFile = async (uploadFile: UploadFile): Promise<void> => {
-    if (!user?.Secret_key) return;
+  const uploadSingleFile = async (uploadFile: UploadFile): Promise<boolean> => {
+    if (!user?.Secret_key) return false;
 
     setFiles(prev => prev.map(f => 
       f.id === uploadFile.id ? { ...f, status: 'uploading', progress: 0 } : f
@@ -125,7 +125,7 @@ export const Upload: React.FC<UploadProps> = ({
     try {
       const xhr = new XMLHttpRequest();
       
-      await new Promise<void>((resolve, reject) => {
+      return await new Promise<boolean>((resolve) => {
         xhr.upload.onprogress = (e) => {
           if (e.lengthComputable) {
             const percent = Math.round((e.loaded / e.total) * 100);
@@ -143,18 +143,18 @@ export const Upload: React.FC<UploadProps> = ({
                 f.id === uploadFile.id ? { ...f, status: 'success', progress: 100, result: result.data } : f
               ));
               onSuccess(result.data);
-              resolve();
+              resolve(true);
             } else {
               setFiles(prev => prev.map(f => 
                 f.id === uploadFile.id ? { ...f, status: 'error', error: result.msg || '上传失败' } : f
               ));
-              reject(new Error(result.msg));
+              resolve(false);
             }
           } catch {
             setFiles(prev => prev.map(f => 
               f.id === uploadFile.id ? { ...f, status: 'error', error: '解析响应失败' } : f
             ));
-            reject(new Error('解析响应失败'));
+            resolve(false);
           }
         };
 
@@ -162,7 +162,7 @@ export const Upload: React.FC<UploadProps> = ({
           setFiles(prev => prev.map(f => 
             f.id === uploadFile.id ? { ...f, status: 'error', error: '网络错误' } : f
           ));
-          reject(new Error('网络错误'));
+          resolve(false);
         };
 
         xhr.open('POST', '/api/upload');
@@ -170,6 +170,7 @@ export const Upload: React.FC<UploadProps> = ({
       });
     } catch (err: any) {
       onError(err.message);
+      return false;
     }
   };
 
@@ -187,19 +188,24 @@ export const Upload: React.FC<UploadProps> = ({
 
     setIsUploading(true);
 
+    let uploadSuccessCount = 0;
+    let uploadErrorCount = 0;
+
     for (const file of pendingFiles) {
-      await uploadSingleFile(file);
+      const success = await uploadSingleFile(file);
+      if (success) {
+        uploadSuccessCount++;
+      } else {
+        uploadErrorCount++;
+      }
     }
 
     setIsUploading(false);
     
-    const successCount = files.filter(f => f.status === 'success').length;
-    const errorCount = files.filter(f => f.status === 'error').length;
-    
-    if (errorCount === 0) {
-      addToast(`全部上传成功 (${successCount}张)`, 'success');
+    if (uploadErrorCount === 0) {
+      addToast(`全部上传成功 (${uploadSuccessCount}张)`, 'success');
     } else {
-      addToast(`上传完成: ${successCount}成功, ${errorCount}失败`, 'warning');
+      addToast(`上传完成: ${uploadSuccessCount}成功, ${uploadErrorCount}失败`, 'warning');
     }
   };
 
