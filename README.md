@@ -4,13 +4,10 @@
 
 ## 📸 界面预览
 
-<p align="center">
-  <img src="images/Screenshot_2026-02-14-13-53-03-563_com.microsoft..jpg" width="200" />
-  <img src="images/Screenshot_2026-02-14-13-53-17-650_com.microsoft..jpg" width="200" />
-  <img src="images/Screenshot_2026-02-14-13-53-32-717_com.microsoft..jpg" width="200" />
-  <img src="images/Screenshot_2026-02-14-13-53-39-682_com.microsoft..jpg" width="200" />
-  <img src="images/Screenshot_2026-02-14-13-53-55-122_com.microsoft..jpg" width="200" />
-</p>
+| | | |
+|:---:|:---:|:---:|
+| ![首页](images/qq_pic_merged_1771048833095.jpg) | ![图库](images/qq_pic_merged_1771048848645.jpg) | ![上传](images/qq_pic_merged_1771048865053.jpg) |
+| ![目录](images/qq_pic_merged_1771048881427.jpg) | ![设置](images/qq_pic_merged_1771048897065.jpg) | ![管理](images/qq_pic_merged_1771048911076.jpg) |
 
 ## ✨ 功能特性
 
