@@ -86,7 +86,7 @@ cp -r dist/* ../public/
 
 ### 配置
 
-1. 访问/install目录进行安装
+1. 访问 `/install` 目录进行安装
 
 2. 配置 Web 服务器，将根目录指向 `public/`
 
