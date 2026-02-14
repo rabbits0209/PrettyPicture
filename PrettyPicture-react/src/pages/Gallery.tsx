@@ -32,6 +32,9 @@ export const Gallery: React.FC = () => {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [batchDeleting, setBatchDeleting] = useState(false);
   const [copyModalOpen, setCopyModalOpen] = useState(false);
+  const [moveModalOpen, setMoveModalOpen] = useState(false);
+  const [moveFolderId, setMoveFolderId] = useState<number>(0);
+  const [moving, setMoving] = useState(false);
 
   const pageSize = 20;
   const canViewAll = user?.role?.is_read_all === 1 || user?.role?.is_admin === 1;
@@ -240,6 +243,30 @@ export const Gallery: React.FC = () => {
     }
   };
 
+  // 批量移动目录
+  const handleBatchMove = async () => {
+    if (selectedIds.size === 0) {
+      addToast('请先选择图片', 'warning');
+      return;
+    }
+    setMoveModalOpen(true);
+  };
+
+  const confirmMove = async () => {
+    setMoving(true);
+    try {
+      await imagesApi.move(Array.from(selectedIds), moveFolderId);
+      addToast(`成功移动 ${selectedIds.size} 张图片`, 'success');
+      setMoveModalOpen(false);
+      setSelectedIds(new Set());
+      loadImages(page);
+    } catch (err: any) {
+      addToast(err.msg || '移动失败', 'error');
+    } finally {
+      setMoving(false);
+    }
+  };
+
   // 瀑布流分布
   const distributeItems = () => {
     const cols: ImageItem[][] = Array.from({ length: columns }, () => []);
@@ -417,6 +444,14 @@ export const Gallery: React.FC = () => {
             >
               复制链接
             </Button>
+            <Button
+              variant="flat"
+              size="sm"
+              onClick={handleBatchMove}
+              isDisabled={selectedIds.size === 0}
+            >
+              移动目录
+            </Button>
             {canDelete && (
               <Button
                 variant="flat"
@@ -527,6 +562,37 @@ export const Gallery: React.FC = () => {
               onClick={() => copyWithFormat('html')}
             >
               HTML 格式
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* 移动目录弹窗 */}
+      <Modal
+        isOpen={moveModalOpen}
+        onClose={() => setMoveModalOpen(false)}
+        title="移动到目录"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-foreground/60">选择目标目录（共 {selectedIds.size} 张图片）</p>
+          <select
+            value={moveFolderId}
+            onChange={(e) => setMoveFolderId(Number(e.target.value))}
+            className="w-full px-3 py-2 bg-content1 border border-divider rounded-lg text-foreground"
+          >
+            <option value={0}>默认目录</option>
+            {folders.map((folder) => (
+              <option key={folder.id} value={folder.id}>
+                {folder.name}
+              </option>
+            ))}
+          </select>
+          <div className="flex gap-2 justify-end">
+            <Button variant="flat" onClick={() => setMoveModalOpen(false)}>
+              取消
+            </Button>
+            <Button color="primary" onClick={confirmMove} isLoading={moving}>
+              确认移动
             </Button>
           </div>
         </div>

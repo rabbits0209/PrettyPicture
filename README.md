@@ -1,65 +1,154 @@
-<h2>PrettyPicture - 企业/团队图床系统</h2>
-☁ 使用thinkphp+react开发，前后端分离；本仓库为完整版程序，下载后根据安装教程安装即可使用；
+# PrettyPicture 图床
 
-##  程序功能
-* 支持第三方云储存，本地、阿里云OSS、腾讯云COS、七牛云KODO、华为云OBS、AWS S3等等
-* 支持多桶储存，可同时添加多个对象存储桶管理，适合团队多桶协作
-* 多图上传、拖拽上传、粘贴上传、上传预览、全屏预览、一键复制图片外链
-* 多用户管理、分组管理；不同分组用户控制不同的存储桶
-* 完整的权限控制功能，不同用户组可分配不同的操作权限，控制其上传删除及查看
-* 完整的可视化日志功能，记录用户所有操作，方便事件溯源
-* 全局配置用户初始剩余储存空间、设置指定用户剩余储存空间
-* 支持接口上传、接口删除
-* React 和 HeroUI风格，高性能 / 精致 / 优雅 / 简洁而不简单
+一个简洁美观的图床系统，基于 ThinkPHP 8 + React 18 构建。支持多种云存储，具备完善的用户权限管理。
 
+## 📸 界面预览
 
-##  安装要求
-* PHP 版本 &ge; 8.2
-* Mysql版本 &ge; 5.6
-* PDO 拓展
-* fileinfo 拓展
-* curl 拓展
-* ZipArchive 支持
+<p align="center">
+  <img src="images/Screenshot_2026-02-14-13-53-03-563_com.microsoft..jpg" width="200" />
+  <img src="images/Screenshot_2026-02-14-13-53-17-650_com.microsoft..jpg" width="200" />
+  <img src="images/Screenshot_2026-02-14-13-53-32-717_com.microsoft..jpg" width="200" />
+  <img src="images/Screenshot_2026-02-14-13-53-39-682_com.microsoft..jpg" width="200" />
+  <img src="images/Screenshot_2026-02-14-13-53-55-122_com.microsoft..jpg" width="200" />
+</p>
 
-##  安装教程
-1. 下载PrettyPicture，上传至 web 运行环境，解压。
-2. 设置运行目录为 public。
-3. 配置网站默认文档：
-~~~
-index.html
-index.php
-~~~
+## ✨ 功能特性
 
-4. 配置 Rewrite 规则为：thinkphp
-####  \[ Apache \]
+### 📷 图片管理
+- 图片上传（支持拖拽、粘贴）
+- 目录分类管理
+- 批量操作（复制链接、移动目录、删除）
+- 瀑布流展示
+- 图片搜索与筛选
 
-~~~
-<IfModule mod_rewrite.c>
-  Options +FollowSymlinks -Multiviews
-  RewriteEngine On
+### ☁️ 多存储策略
+- 本地存储
+- 阿里云 OSS
+- 腾讯云 COS
+- 七牛云 KODO
+- 华为云 OBS
+- AWS S3（兼容 MinIO、Cloudflare R2 等）
 
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteRule ^(.*)$ index.php/$1 [QSA,PT,L]
-</IfModule>
-~~~
-####  \[ Nginx\]
+### 👤 用户系统
+- 用户注册/登录
+- 邮箱验证码
+- 密码找回
+- 个人资料管理
+- 存储配额控制
 
-~~~
-location / { 
-   if (!-e $request_filename) {
-   		rewrite  ^(.*)$  /index.php?s=/$1  last;
-    }
-}
-~~~
+### 🔐 权限管理
+- 角色组管理
+- 细粒度权限控制（上传、删除、查看等）
+- 管理员后台
 
-5. 访问 域名/install，根据页面提示安装。
-注：完成后若开启前台注册请登录管理员账号配置发信邮箱
+### 🔌 API 接口
+- 密钥认证上传
+- 图片删除接口
+- 随机图片接口（支持横竖屏自适应）
 
-##  联系我
-- Email: 1742305143@qq.com
+## 🛠 技术栈
 
-##  鸣谢
-- ThinkPHP
-- React
-- HeroUI
+| 后端 | 前端 |
+|------|------|
+| PHP >= 8.2 | React 18 |
+| ThinkPHP 8 | TypeScript |
+| MySQL | Tailwind CSS |
+| JWT 认证 | Zustand |
+| PHPMailer | Vite |
+
+## 📦 安装部署
+
+### 环境要求
+- PHP >= 8.2
+- MySQL >= 5.7
+- Node.js >= 18（仅构建时需要）
+- Composer
+
+### 方式一：下载发布包（推荐）
+
+从 [GitHub Actions](../../actions) 下载最新的 `prettypicture-release.zip`，解压后直接部署。
+
+### 方式二：手动构建
+
+```bash
+# 1. 克隆项目
+git clone https://github.com/your-repo/PrettyPicture.git
+cd PrettyPicture
+
+# 2. 安装后端依赖
+composer install --no-dev
+
+# 3. 构建前端
+cd PrettyPicture-react
+npm install
+npm run build
+
+# 4. 复制前端构建文件
+cp -r dist/* ../public/
+```
+
+### 配置
+
+1. 配置数据库，编辑 `.env` 文件：
+```env
+DATABASE_HOSTNAME=127.0.0.1
+DATABASE_DATABASE=prettypicture
+DATABASE_USERNAME=root
+DATABASE_PASSWORD=your_password
+DATABASE_HOSTPORT=3306
+DATABASE_PREFIX=pp_
+```
+
+2. 导入数据库结构（首次安装）
+
+3. 配置 Web 服务器，将根目录指向 `public/`
+
+4. 确保 `runtime/` 目录可写
+
+## 🔌 API 使用
+
+### 上传图片
+```http
+POST /api/upload?key=YOUR_SECRET_KEY&folder_id=0
+Content-Type: multipart/form-data
+
+file: 图片文件
+```
+
+### 删除图片
+```http
+DELETE /api/delete?key=YOUR_SECRET_KEY&id=IMAGE_ID
+```
+
+### 随机图片
+```http
+GET /api/random?folder_id=1&type=redirect&orientation=auto
+
+# 参数说明
+folder_id: 公开目录ID（必填）
+type: redirect（跳转）或 json（返回URL）
+orientation: auto | vertical | horizontal
+```
+
+## 📁 项目结构
+
+```
+PrettyPicture/
+├── app/                    # 后端应用
+│   ├── controller/         # 控制器
+│   ├── model/              # 数据模型
+│   ├── services/           # 服务类
+│   └── middleware/         # 中间件
+├── config/                 # 配置文件
+├── public/                 # Web 根目录
+└── PrettyPicture-react/    # 前端源码
+    └── src/
+        ├── api/            # API 接口
+        ├── components/     # 组件
+        ├── pages/          # 页面
+        └── store/          # 状态管理
+```
+
+## 📄 License
+
+MIT

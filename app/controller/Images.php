@@ -100,4 +100,50 @@ class Images extends BaseController
         
         return $this->create($name, '删除成功', 200);
     }
+
+    public function move(Request $request): Response
+    {
+        $uid = $request->uid;
+        $data = $request->param();
+        
+        if (!isset($data['ids']) || !is_array($data['ids']) || empty($data['ids'])) {
+            return $this->create(null, '请选择要移动的图片', 400);
+        }
+        
+        $folderId = isset($data['folder_id']) ? (int)$data['folder_id'] : 0;
+        
+        // 验证目标目录（0表示默认目录）
+        if ($folderId > 0) {
+            $folder = FolderModel::where('id', $folderId)->where('user_id', $uid)->find();
+            if (!$folder) {
+                return $this->create(null, '目标目录不存在', 400);
+            }
+        }
+        
+        $userInfo = UserModel::find($uid);
+        $role = RoleModel::find($userInfo?->role_id);
+        
+        $successCount = 0;
+        foreach ($data['ids'] as $id) {
+            $img = ImagesModel::find($id);
+            if (!$img) continue;
+            
+            // 检查权限：只能移动自己的图片，或者管理员可以移动所有
+            $canMove = $role?->is_admin == 1 || $img->user_id == $uid;
+            if (!$canMove) continue;
+            
+            $img->folder_id = $folderId;
+            $img->save();
+            $successCount++;
+        }
+        
+        if ($successCount === 0) {
+            return $this->create(null, '没有可移动的图片', 400);
+        }
+        
+        $folderName = $folderId > 0 ? FolderModel::find($folderId)?->name : '默认目录';
+        $this->setLog($uid, "移动了{$successCount}张图片到目录", $folderName, "");
+        
+        return $this->create(['count' => $successCount], "成功移动{$successCount}张图片", 200);
+    }
 }

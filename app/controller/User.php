@@ -82,6 +82,10 @@ class User extends BaseController
         
         // 头像只能通过 uploadAvatar 接口更新，这里忽略 avatar 字段
         if (isset($data['username'])) {
+            $len = mb_strlen($data['username']);
+            if ($len < 3 || $len > 8) {
+                return $this->create(null, '用户名长度必须在3-8个字符之间', 400);
+            }
             $user->username = $data['username'];
         }
         if (isset($data['phone'])) {

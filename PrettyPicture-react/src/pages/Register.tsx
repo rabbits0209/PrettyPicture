@@ -130,7 +130,7 @@ export const Register: React.FC = () => {
                 onClick={handleSendCode}
                 isLoading={sendingCode}
                 isDisabled={countdown > 0}
-                className="mt-6"
+                className="mt-6 whitespace-nowrap"
               >
                 {countdown > 0 ? `${countdown}s` : '发送验证码'}
               </Button>
