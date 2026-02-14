@@ -51,6 +51,7 @@ Route::group('storage', function () {
 
 Route::group('images', function () {
 	Route::get('query', 'Images/index');
+	Route::post('move', 'Images/move');
 	Route::delete('delete', 'Images/delete');
 })->middleware(\app\middleware\TokenVerify::class);
 

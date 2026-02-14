@@ -14,7 +14,7 @@ interface UIState {
 }
 
 export const useUIStore = create<UIState>((set, get) => ({
-  theme: (typeof window !== 'undefined' && localStorage.getItem('theme') as 'light' | 'dark') || 'dark',
+  theme: (typeof window !== 'undefined' && localStorage.getItem('theme') as 'light' | 'dark') || 'light',
   sidebarOpen: false,
   toasts: [],
   setTheme: (theme) => {
@@ -45,6 +45,6 @@ export const useUIStore = create<UIState>((set, get) => ({
 // Initialize theme on load
 if (typeof window !== 'undefined') {
   const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
-  const theme = savedTheme || 'dark';
+  const theme = savedTheme || 'light';
   document.documentElement.classList.toggle('dark', theme === 'dark');
 }
