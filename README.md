@@ -56,7 +56,7 @@
 ## 📦 安装部署
 
 ### 环境要求
-- PHP >= 8.2
+- PHP >= 8.2(安装PRO,fileinfo,curl扩展)
 - MySQL >= 5.7
 - Node.js >= 18（仅构建时需要）
 - Composer
@@ -86,21 +86,11 @@ cp -r dist/* ../public/
 
 ### 配置
 
-1. 配置数据库，编辑 `.env` 文件：
-```env
-DATABASE_HOSTNAME=127.0.0.1
-DATABASE_DATABASE=prettypicture
-DATABASE_USERNAME=root
-DATABASE_PASSWORD=your_password
-DATABASE_HOSTPORT=3306
-DATABASE_PREFIX=pp_
-```
+1. 访问/install目录进行安装
 
-2. 导入数据库结构（首次安装）
+2. 配置 Web 服务器，将根目录指向 `public/`
 
-3. 配置 Web 服务器，将根目录指向 `public/`
-
-4. 确保 `runtime/` 目录可写
+3. 确保 `runtime/` 目录可写
 
 ## 🔌 API 使用
 
